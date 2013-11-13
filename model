@@ -1,31 +1,66 @@
 <?php
 class Products_model extends CI_Model {
-   function __construct()
+
+    var $ProductName = '';
+    var $ProductID = '';
+    
+    function __construct()
     {
         parent::__construct();
     }
-        
-        function kategori()
+    
+    function get_products()
     {
-        $query = $this->db->get('categories');
-        return $query->result();
-    }
-        function get_products()
-    {
-                
-                $kategori = $this->input->POST ('kategori');
-                $produk = $this->input->POST ('nama_prod');
-                
-                $this->db->like('products.CategoryID', $kategori);
-                $this->db->like('products.ProductName', $produk);
-                
-                $this->db->select('*');
-                $this->db->from('products');
-                $this->db->join('suppliers','products.supplierID=suppliers.supplierID');
-                $this->db->join('categories','products.CategoryID=categories.CategoryID');
-                $query = $this->db->get();
+        $query = $this->db->get('products');
         return $query->result();
     }
 
+    function get_products_by_id($id)
+    {
+        $this->db->where('ProductID',$id);
+        $query = $this->db->get('products');
+        return $query->row();
+    }
+
+                public function caridata($a, $b){
+                $this->db->like('CategoryID', $a);
+                $this->db->like('ProductName', $b);
+                
+                $query = $this->db->get ('products');
+                return $query->result();
+        }
+        
+    // menambahkan data masukan
+    function insert_entry()
+    {
+        $this->ProductName = $this->input->post('ProductName',true);
+        $this->SupplierID = $this->input->post('SupplierID',true);
+        return $this->db->insert('products', $this);
+    }
+
+    // mengupdate data masukan
+    function update_entry()
+    {
+        $this->ProductName = $this->input->post('ProductName',true);
+        $this->SupplierID = $this->input->post('SupplierID',true);
+        return $this->db->update('products', $this, array('ProductID' => $this->input->post('id',true)));
+    }
+
+    // menghapus data
+    function hapus($id)
+    {
+        $this->db->where('ProductID',$id);
+        return $this->db->delete('products');
+    }
+    
+    // mengecek keterangan product
+    function cek_dependensi($id)
+    {
+        $this->db->where('ProductID',$id);
+        $query = $this->db->count_all('products');
+        return ($query==0) ? true : false;
+    }
 }
-?>
+
+   
+
